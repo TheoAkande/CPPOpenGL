@@ -1,0 +1,2 @@
+# CPPOpenGL
+Exercises and Programs following the "computergraphicsprogrammminginopenglusingcplusplussecondedition" textbook
