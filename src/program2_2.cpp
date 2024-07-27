@@ -1,4 +1,3 @@
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -34,13 +33,13 @@ GLuint createShaderProgram() {
     return vfProgram;
 }
 
-void init22(GLFWwindow* window) {
+void init(GLFWwindow* window) {
     renderingProgram = createShaderProgram();
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
-void display22(GLFWwindow* window, double currentTime) {
+void display(GLFWwindow* window, double currentTime) {
     glUseProgram(renderingProgram);
     glPointSize(30.0f);
     glDrawArrays(GL_POINTS, 0, 1);
@@ -58,9 +57,9 @@ int program2_2(void) {
         exit(EXIT_FAILURE); 
     }
     glfwSwapInterval(1);
-    init22(window);
+    init(window);
     while (!glfwWindowShouldClose(window)) {
-        display22(window, glfwGetTime());
+        display(window, glfwGetTime());
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

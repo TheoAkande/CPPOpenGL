@@ -20,8 +20,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 add_executable(CPPOpenGL 
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/program2_1.cpp
-    ${CMAKE_SOURCE_DIR}/src/program2_2.cpp
+    ${CMAKE_SOURCE_DIR}/src/program2_3.cpp
 )
 
 # Link the libraries
