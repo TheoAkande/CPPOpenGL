@@ -21,7 +21,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 add_executable(CPPOpenGL 
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/chapter2/program2_3.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter2/program2_4.cpp
 )
 
 # Link the libraries
@@ -36,10 +36,15 @@ add_custom_command(TARGET CPPOpenGL POST_BUILD
 file(COPY ${CMAKE_SOURCE_DIR}/src/shaders DESTINATION ${CMAKE_BINARY_DIR})
 
 # Post-build event to copy shaders again after each build
+# add_custom_command(
+#     TARGET CPPOpenGL POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#     ${CMAKE_SOURCE_DIR}/src/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
+# )
 add_custom_command(
     TARGET CPPOpenGL POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/src/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
+    ${CMAKE_SOURCE_DIR}/src/chapter2/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR})
