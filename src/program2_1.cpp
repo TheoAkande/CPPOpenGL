@@ -2,14 +2,15 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Utils.h"
+#include "program2_1.h"
 
 using namespace std;
 
-void init(GLFWwindow* window) {
+void init21(GLFWwindow* window) {
 
 }
 
-void display(GLFWwindow* window, double currentTime) {
+void display21(GLFWwindow* window, double currentTime) {
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -26,9 +27,9 @@ int program2_1(void) {
         exit(EXIT_FAILURE); 
     }
     glfwSwapInterval(1);
-    init(window);
+    init21(window);
     while (!glfwWindowShouldClose(window)) {
-        display(window, glfwGetTime());
+        display21(window, glfwGetTime());
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
