@@ -11,6 +11,7 @@ find_package(OpenGL REQUIRED)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/chapter2
 )
 
 # Add the library directory
@@ -20,7 +21,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 add_executable(CPPOpenGL 
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/program2_3.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter2/program2_3.cpp
 )
 
 # Link the libraries
