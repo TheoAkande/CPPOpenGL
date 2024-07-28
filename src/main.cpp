@@ -1,9 +1,9 @@
-#include "program2_6.h"
+#include "program2_7.h"
 
 using namespace std;
 
 int main(void) {
 
-    program2_6();
+    program2_7();
 
 }
