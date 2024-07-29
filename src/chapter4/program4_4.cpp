@@ -76,6 +76,8 @@ void display(GLFWwindow* window, double currentTime) {
     
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
+    glEnable(GL_CULL_FACE);
+
     // push view matrix onto the stack
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
     mvStack.push(vMat);
@@ -91,6 +93,7 @@ void display(GLFWwindow* window, double currentTime) {
     glEnableVertexAttribArray(0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LEQUAL);
+    glFrontFace(GL_CCW); 
     glDrawArrays(GL_TRIANGLES, 0, 18); // draw the sun
     mvStack.pop(); // remove the sun’s axial rotation from the stack
     //----------------------- cube == planet ---------------------------------------------
@@ -104,6 +107,7 @@ void display(GLFWwindow* window, double currentTime) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
+    glFrontFace(GL_CW); 
     glDrawArrays(GL_TRIANGLES, 0, 36); // draw the planet
     mvStack.pop(); // remove the planet’s axial rotation from the stack
     //----------------------- smaller cube == moon -----------------------------------
@@ -118,6 +122,7 @@ void display(GLFWwindow* window, double currentTime) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
+    glFrontFace(GL_CW); 
     glDrawArrays(GL_TRIANGLES, 0, 36); // draw the moon
     // remove moon scale/rotation/position, planet position, sun position, and view matrices from stack
     mvStack.pop(); mvStack.pop(); mvStack.pop(); mvStack.pop();
