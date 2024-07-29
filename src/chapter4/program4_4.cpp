@@ -59,6 +59,9 @@ void init(GLFWwindow* window) {
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; 
     pyrLocX = 1.0f; pyrLocY = 2.0f; pyrLocZ = 0.0f;
     setupVertices();
+    glfwGetFramebufferSize(window, &width, &height);
+    aspect = (float)width / (float)height;
+    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); 
 }
 
 void display(GLFWwindow* window, double currentTime) {
@@ -69,10 +72,6 @@ void display(GLFWwindow* window, double currentTime) {
     // get the uniform variables for the MV and projection matrices
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     projLoc = glGetUniformLocation(renderingProgram, "proj_matrix");
-    // build perspective matrix
-    glfwGetFramebufferSize(window, &width, &height);
-    aspect = (float)width / (float)height;
-    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degrees
     // build view matrix, model matrix, and model-view matrix
     
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
@@ -124,6 +123,12 @@ void display(GLFWwindow* window, double currentTime) {
     mvStack.pop(); mvStack.pop(); mvStack.pop(); mvStack.pop();
 }
 
+void window_reshape_callback(GLFWwindow* window, int newWidth, int newHeight) {
+    aspect = (float)newWidth / (float)newHeight; // new width&height provided by the callback
+    glViewport(0, 0, newWidth, newHeight); // sets screen region associated with framebuffer
+    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+}
+
 int program4_4(void) {
     if (!glfwInit()) { 
         exit(EXIT_FAILURE); 
@@ -136,6 +141,7 @@ int program4_4(void) {
         exit(EXIT_FAILURE); 
     }
     glfwSwapInterval(1);
+    glfwSetWindowSizeCallback(window, window_reshape_callback);
     init(window);
     while (!glfwWindowShouldClose(window)) {
         display(window, glfwGetTime());
