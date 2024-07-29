@@ -1,9 +1,9 @@
-#include "exercise2_4.h"
+#include "exercise3_1.h"
 
 using namespace std;
 
 int main(void) {
 
-    exercise2_4();
+    exercise3_1();
 
 }
