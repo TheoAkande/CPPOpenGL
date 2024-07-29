@@ -13,6 +13,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/chapter2
     ${CMAKE_SOURCE_DIR}/src/chapter3
+    ${CMAKE_SOURCE_DIR}/src/chapter4
 )
 
 # Add the library directory
@@ -22,7 +23,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 add_executable(CPPOpenGL 
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/chapter3/exercise3_1.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter4/program4_1.cpp
 )
 
 # Link the libraries
@@ -45,7 +46,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/src/shaders DESTINATION ${CMAKE_BINARY_DIR})
 add_custom_command(
     TARGET CPPOpenGL POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/src/chapter3/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
+    ${CMAKE_SOURCE_DIR}/src/chapter4/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR})
