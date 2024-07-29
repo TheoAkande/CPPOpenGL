@@ -52,7 +52,7 @@ void setupVertices(void) {
 void init(GLFWwindow* window) {
     renderingProgram = Utils::createShaderProgram("shaders/vert4_2.glsl", "shaders/frag4_2.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
-    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; 
+    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 420.0f; 
     setupVertices();
 }
 
@@ -83,7 +83,7 @@ void display(GLFWwindow* window, double currentTime) {
     // adjust OpenGL settings and draw model
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 24);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 100000);
 }
 
 int program4_2(void) {
