@@ -9,6 +9,8 @@ using namespace std;
 glm::vec3 cameraPoint, cameraLoc;
 float cameraRotAngle;
 
+float inc;
+
 float cameraX, cameraY, cameraZ;
 float cubeLocX, cubeLocY, cubeLocZ;
 float pyrLocX, pyrLocY, pyrLocZ;
@@ -58,11 +60,12 @@ void setupVertices(void) {
 }
 
 void init(GLFWwindow* window) {
+    inc = 0.0f;
     renderingProgram = Utils::createShaderProgram("shaders/vert4_4.glsl", "shaders/frag4_4.glsl");
-    cameraX = 0.0f; cameraY = 3.0f; cameraZ = 10.0f;
+    cameraX = 0.0f; cameraY = 20.0f; cameraZ = 0.0f;
     cameraPoint = glm::vec3(0.0f, 0.0f, 0.0f);
     cameraLoc = glm::vec3(cameraX, cameraY, cameraZ);
-    cameraRotAngle = 3.14159 / 2.0f; // 90 degrees
+    cameraRotAngle = 0.0f;
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; 
     pyrLocX = 1.0f; pyrLocY = 2.0f; pyrLocZ = 0.0f;
     setupVertices();
@@ -85,9 +88,25 @@ void display(GLFWwindow* window, double currentTime) {
 
     glEnable(GL_CULL_FACE);
 
-    // push view matrix onto the stack
-    // vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    // Camera point to the planet
+    cameraPoint = glm::vec3(sin((float)currentTime)*4.0, 0.0f, cos((float)currentTime)*4.0);
+
+    // Camera move around
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        cameraRotAngle += 0.01f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        cameraRotAngle -= 0.01f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        inc += 0.1f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        inc -= 0.1f;
+    }
+    cameraLoc = glm::vec3(0.0f, inc, 10.0f);
     Utils::calculateVMat(&vMat, &cameraLoc, &cameraPoint, cameraRotAngle);
+
     mvStack.push(vMat);
     // ---------------------- pyramid == sun --------------------------------------------
     mvStack.push(mvStack.top());
@@ -106,9 +125,12 @@ void display(GLFWwindow* window, double currentTime) {
     mvStack.pop(); // remove the sun’s axial rotation from the stack
     //----------------------- cube == planet ---------------------------------------------
     mvStack.push(mvStack.top());
-    mvStack.top() *=
-    glm::translate(glm::mat4(1.0f), glm::vec3(sin((float)currentTime)*4.0, 0.0f, cos((float)currentTime)*4.0));
+    mvStack.top() *= glm::translate(
+        glm::mat4(1.0f), 
+        glm::vec3(sin((float)currentTime)*4.0, 0.0f, cos((float)currentTime)*4.0)
+    );
     mvStack.push(mvStack.top());
+
     mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(0.0, 1.0, 0.0));
     // planet rotation
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top()));
@@ -121,8 +143,7 @@ void display(GLFWwindow* window, double currentTime) {
     //----------------------- smaller cube == moon -----------------------------------
     mvStack.push(mvStack.top());
     mvStack.top() *=
-    glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, sin((float)currentTime)*2.0,
-    cos((float)currentTime)*2.0));
+    glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, sin((float)currentTime)*2.0, cos((float)currentTime)*2.0));
     mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(0.0, 0.0, 1.0));
     // moon rotation
     mvStack.top() *= glm::scale(glm::mat4(1.0f), glm::vec3(0.25f, 0.25f, 0.25f)); // make the moon smaller

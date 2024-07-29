@@ -212,9 +212,10 @@ void Utils::calculateVMat(glm::mat4 *vMat, glm::vec3 *cameraLoc, glm::vec3 *came
         *cameraPoint, 
         glm::normalize(
             glm::vec3(
-                glm::rotate(glm::mat4(1.0f), 
-                -cameraRotAngle, 
-                glm::normalize(*cameraPoint - *cameraLoc)) * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)
+                glm::rotate(glm::mat4(1.0f), -cameraRotAngle, glm::normalize(*cameraPoint - *cameraLoc)) * 
+                (((*cameraPoint - *cameraLoc).x == 0 && (*cameraPoint - *cameraLoc).z == 0) 
+                ? glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)
+                : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f))
             )
         )
     );
