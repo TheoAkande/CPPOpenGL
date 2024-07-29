@@ -205,3 +205,17 @@ float* Utils::bronzeAmbient() { static float a[4] = { 0.2125f, 0.1275f, 0.0540f,
 float* Utils::bronzeDiffuse() { static float a[4] = { 0.7140f, 0.4284f, 0.1814f, 1 }; return (float*)a; }
 float* Utils::bronzeSpecular() { static float a[4] = { 0.3936f, 0.2719f, 0.1667f, 1 }; return (float*)a; }
 float Utils::bronzeShininess() { return 25.6f; }
+
+void Utils::calculateVMat(glm::mat4 *vMat, glm::vec3 *cameraLoc, glm::vec3 *cameraPoint, float cameraRotAngle) {
+    *vMat = glm::lookAt(
+        *cameraLoc, 
+        *cameraPoint, 
+        glm::normalize(
+            glm::vec3(
+                glm::rotate(glm::mat4(1.0f), 
+                -cameraRotAngle, 
+                glm::normalize(*cameraPoint - *cameraLoc)) * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)
+            )
+        )
+    );
+}

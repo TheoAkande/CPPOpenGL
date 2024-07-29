@@ -43,4 +43,6 @@ public:
 	static float* bronzeDiffuse();
 	static float* bronzeSpecular();
 	static float bronzeShininess();
+
+    static void calculateVMat(glm::mat4 *vMat, glm::vec3 *cameraLoc, glm::vec3 *cameraPoint, float cameraRotAngle);
 };
