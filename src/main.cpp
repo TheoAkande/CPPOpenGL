@@ -1,9 +1,9 @@
-#include "customTorus.h"
+#include "program6_2.h"
 
 using namespace std;
 
 int main(void) {
 
-    customTorus();
+    program6_2();
 
 }
