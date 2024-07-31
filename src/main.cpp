@@ -1,9 +1,9 @@
-#include "customPipe.h"
+#include "program6_3.h"
 
 using namespace std;
 
 int main(void) {
 
-    customPipe();
+    program6_3();
 
 }
