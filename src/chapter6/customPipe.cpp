@@ -26,7 +26,7 @@ Pipe myPipe(vector<glm::vec3>( {
     glm::vec3(-5.0f, 0.0f, 0.0f),
     glm::vec3(-4.0f, 1.0f, 0.0f),
     glm::vec3(-3.0f, 0.0f, 0.0f)
-}), 24, 0.5f);
+}), 25, 0.5f);
 
 GLuint brickTexture, iceTexture, customTexture, earthTexture;
 
@@ -59,7 +59,7 @@ void setupVertices(void) {
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[0]);
-    glGenBuffers(4, vbo); // generate VBOs as before, plus one for indices
+    glGenBuffers(numVBOs, vbo); // generate VBOs as before, plus one for indices
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // vertex positions
     glBufferData(GL_ARRAY_BUFFER, pvalues.size() * 4, &pvalues[0], GL_STATIC_DRAW);
@@ -88,7 +88,7 @@ void init(GLFWwindow* window) {
     for (int i = 0; i < 200; i++) {
         midPoints.push_back(glm::vec3((float)i / 10.0f, 0.0f, sin(i / 10.0f)));
     }
-    myPipe = Pipe(midPoints, 24, 1.0f);
+    myPipe = Pipe(midPoints, 25, 1.0f);
 
     renderingProgram = Utils::createShaderProgram("shaders/vert6_1.glsl", "shaders/frag6_1.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
@@ -132,7 +132,6 @@ void display(GLFWwindow* window, double currentTime) {
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
@@ -140,6 +139,8 @@ void display(GLFWwindow* window, double currentTime) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
+
+     // Draw Pipe
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, brickTexture);
@@ -149,6 +150,28 @@ void display(GLFWwindow* window, double currentTime) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
     glDrawElements(GL_TRIANGLES, myPipe.getNumIndicesPipe(), GL_UNSIGNED_INT, 0);
+
+    // Draw Start Face
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, customTexture);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[4]);
+    glDrawElements(GL_TRIANGLE_FAN, myPipe.getNumIndicesFace(), GL_UNSIGNED_INT, 0);
+
+    //Draw end face
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, iceTexture);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[5]);
+    glDrawElements(GL_TRIANGLE_FAN, myPipe.getNumIndicesFace(), GL_UNSIGNED_INT, 0);
 }
 
 int customPipe(void) {
