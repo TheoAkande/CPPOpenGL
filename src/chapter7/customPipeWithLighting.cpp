@@ -1,11 +1,12 @@
 #include "customPipeWithLighting.h"
 #include "Utils.h"
 #include "Pipe.h"
+#include "Sphere.h"
 
 using namespace std;
 
 #define numVAOs 1
-#define numVBOs 6
+#define numVBOs 9
 
 glm::vec3 cameraPoint, cameraLoc;
 float cameraRotAngle;
@@ -13,7 +14,7 @@ float cameraRotAngle;
 float lightVOffset = 0.0f;
 float cameraX, cameraY, cameraZ;
 float sphereLocX, sphereLocY, sphereLocZ;
-GLuint renderingProgram;
+GLuint renderingProgram, otherRenderingProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
@@ -45,12 +46,47 @@ Pipe myPipe(vector<glm::vec3>( {
     glm::vec3(-3.0f, 0.0f, 0.0f)
 }), 25, 0.5f);
 
-GLuint brickTexture, iceTexture, customTexture, earthTexture;
+Sphere mySphere(48);
+
+GLuint brickTexture, iceTexture, customTexture, earthTexture, sunTexture;
 
 
 void setupVertices(void) { 
 
-    
+    std::vector<int> indS = mySphere.getIndices();
+    std::vector<glm::vec3> vertS = mySphere.getVertices();
+    std::vector<glm::vec2> texS = mySphere.getTexCoords();
+    std::vector<glm::vec3> normS = mySphere.getNormals();
+    std::vector<float> pvaluesS; // vertex positions
+    std::vector<float> tvaluesS; // texture coordinates
+    std::vector<float> nvaluesS; // normal vectors
+
+    int numIndices = mySphere.getNumIndices();
+
+    for (int i = 0; i < numIndices; i++) {
+        pvaluesS.push_back((vertS[indS[i]]).x);
+        pvaluesS.push_back((vertS[indS[i]]).y);
+        pvaluesS.push_back((vertS[indS[i]]).z);
+        tvaluesS.push_back((texS[indS[i]]).s);
+        tvaluesS.push_back((texS[indS[i]]).t);
+        nvaluesS.push_back((normS[indS[i]]).x);
+        nvaluesS.push_back((normS[indS[i]]).y);
+        nvaluesS.push_back((normS[indS[i]]).z);
+    }
+
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[0]);
+    glGenBuffers(numVBOs, vbo);
+
+    // put the vertices into buffer #0
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[6]);
+    glBufferData(GL_ARRAY_BUFFER, pvaluesS.size() * 4, &pvaluesS[0], GL_STATIC_DRAW);
+    // put the texture coordinates into buffer #1
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[7]);
+    glBufferData(GL_ARRAY_BUFFER, tvaluesS.size() * 4, &tvaluesS[0], GL_STATIC_DRAW);
+    // put the normals into buffer #2
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[8]);
+    glBufferData(GL_ARRAY_BUFFER, nvaluesS.size() * 4, &nvaluesS[0], GL_STATIC_DRAW);
 
     std::vector<glm::vec3> vert = myPipe.getVertices();
     std::vector<glm::vec2> tex = myPipe.getTexCoords();
@@ -76,9 +112,9 @@ void setupVertices(void) {
         nvalues.push_back(norm[i].z);
     }
 
-    glGenVertexArrays(1, vao);
-    glBindVertexArray(vao[0]);
-    glGenBuffers(numVBOs, vbo); // generate VBOs as before, plus one for indices
+    // glGenVertexArrays(1, vao);
+    // glBindVertexArray(vao[0]);
+    // glGenBuffers(numVBOs, vbo); // generate VBOs as before, plus one for indices
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // vertex positions
     glBufferData(GL_ARRAY_BUFFER, pvalues.size() * 4, &pvalues[0], GL_STATIC_DRAW);
@@ -138,6 +174,7 @@ void init(GLFWwindow* window) {
     myPipe = Pipe(midPoints, 25, 1.0f);
 
     renderingProgram = Utils::createShaderProgram("shaders/vert7_3.glsl", "shaders/frag7_3.glsl");
+    otherRenderingProgram = Utils::createShaderProgram("shaders/vertNoLight.glsl", "shaders/fragNoLight.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
 
     cameraLoc = glm::vec3(0.0f, 0.0f, 8.0f);
@@ -150,6 +187,7 @@ void init(GLFWwindow* window) {
     iceTexture = Utils::loadTexture("assets/textures/ice.jpg");
     customTexture = Utils::loadTexture("assets/textures/5050.jpg");
     earthTexture = Utils::loadTexture("assets/textures/earth.jpg");
+    sunTexture = Utils::loadTexture("assets/textures/sun.jpg");
 
     currentLightPos = glm::vec3(initialLightLoc.x, initialLightLoc.y, initialLightLoc.z);
 }
@@ -230,6 +268,44 @@ void display(GLFWwindow* window, double currentTime) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[5]);
     glDrawElements(GL_TRIANGLE_FAN, myPipe.getNumIndicesFace(), GL_UNSIGNED_INT, 0);
+
+
+    // draw the sphere
+    glUseProgram(otherRenderingProgram);
+    // get the uniform variables for the MV and projection matrices
+    mvLoc = glGetUniformLocation(otherRenderingProgram, "mv_matrix");
+    projLoc = glGetUniformLocation(otherRenderingProgram, "proj_matrix");
+    // build perspective matrix
+    glfwGetFramebufferSize(window, &width, &height);
+    aspect = (float)width / (float)height;
+    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degrees
+    // build view matrix, model matrix, and model-view matrix
+    // the view matrix is computed once and used for both objects
+    Utils::calculateVMat(&vMat, &cameraLoc, &cameraPoint, cameraRotAngle);
+    // draw the cube (use buffer #0)
+    mMat = glm::translate(glm::mat4(1.0f), currentLightPos);
+    mMat *= glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+    mvMat = vMat * mMat;
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[6]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[7]);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, sunTexture);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glDrawArrays(GL_TRIANGLES, 0, mySphere.getNumIndices());
+
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
