@@ -31,7 +31,7 @@ add_executable(CPPOpenGL
     ${CMAKE_SOURCE_DIR}/src/Torus.cpp
     ${CMAKE_SOURCE_DIR}/src/Pipe.cpp
     ${CMAKE_SOURCE_DIR}/src/ImportedModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/chapter7/program7_2.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter7/program7_3.cpp
 )
 
 # Link the libraries

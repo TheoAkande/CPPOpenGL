@@ -1,4 +1,4 @@
-#include "program7_2.h"
+#include "program7_3.h"
 #include "Utils.h"
 #include "Torus.h"
 
@@ -106,7 +106,7 @@ void installLights(glm::mat4 vMatrix) {
 }
 
 void init(GLFWwindow* window) {
-    renderingProgram = Utils::createShaderProgram("shaders/vert7_2.glsl", "shaders/frag7_2.glsl");
+    renderingProgram = Utils::createShaderProgram("shaders/vert7_3.glsl", "shaders/frag7_3.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
 
     cameraLoc = glm::vec3(0.0f, 0.0f, 8.0f);
@@ -174,13 +174,13 @@ void display(GLFWwindow* window, double currentTime) {
 
 }
 
-int program7_2(void) {
+int program7_3(void) {
     if (!glfwInit()) { 
         exit(EXIT_FAILURE); 
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(1200, 1000, "Chapter7 - program2", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1200, 1000, "Chapter7 - program3", NULL, NULL);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) { 
         exit(EXIT_FAILURE); 
