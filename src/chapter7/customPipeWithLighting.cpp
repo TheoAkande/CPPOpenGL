@@ -10,6 +10,7 @@ using namespace std;
 glm::vec3 cameraPoint, cameraLoc;
 float cameraRotAngle;
 
+float lightVOffset = 0.0f;
 float cameraX, cameraY, cameraZ;
 float sphereLocX, sphereLocY, sphereLocZ;
 GLuint renderingProgram;
@@ -48,6 +49,8 @@ GLuint brickTexture, iceTexture, customTexture, earthTexture;
 
 
 void setupVertices(void) { 
+
+    
 
     std::vector<glm::vec3> vert = myPipe.getVertices();
     std::vector<glm::vec2> tex = myPipe.getTexCoords();
@@ -147,9 +150,20 @@ void init(GLFWwindow* window) {
     iceTexture = Utils::loadTexture("assets/textures/ice.jpg");
     customTexture = Utils::loadTexture("assets/textures/5050.jpg");
     earthTexture = Utils::loadTexture("assets/textures/earth.jpg");
+
+    currentLightPos = glm::vec3(initialLightLoc.x, initialLightLoc.y, initialLightLoc.z);
 }
 
 void display(GLFWwindow* window, double currentTime) {
+
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        lightVOffset += 0.1f;
+        currentLightPos.z += 0.1f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        lightVOffset -= 0.1f;
+        currentLightPos.z -= 0.1f;
+    }
 
     cameraLoc.x = 5.0f * cos(currentTime);
     cameraLoc.z = 5.0f * sin(currentTime);
@@ -174,7 +188,6 @@ void display(GLFWwindow* window, double currentTime) {
     mMat = glm::translate(glm::mat4(1.0f), glm::vec3(sphereLocX, sphereLocY, sphereLocZ));
     mMat *= glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
 
-    currentLightPos = glm::vec3(initialLightLoc.x, initialLightLoc.y, initialLightLoc.z);
     installLights(vMat);
 
     mvMat = vMat * mMat;
@@ -219,6 +232,17 @@ void display(GLFWwindow* window, double currentTime) {
     glDrawElements(GL_TRIANGLE_FAN, myPipe.getNumIndicesFace(), GL_UNSIGNED_INT, 0);
 }
 
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+    int halfWidth = width / 2;
+    int halfHeight = height / 2;
+
+    currentLightPos = glm::vec3(
+        cameraPoint.x + (xpos - halfWidth) / halfWidth,
+        cameraPoint.y + (halfHeight - ypos) / halfHeight,
+        cameraPoint.z + lightVOffset
+    );
+}
+
 int customPipe(void) {
     if (!glfwInit()) { 
         exit(EXIT_FAILURE); 
@@ -227,6 +251,7 @@ int customPipe(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     GLFWwindow* window = glfwCreateWindow(1200, 1000, "Custom Pipe with lighting", NULL, NULL);
     glfwMakeContextCurrent(window);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
     if (glewInit() != GLEW_OK) { 
         exit(EXIT_FAILURE); 
     }
