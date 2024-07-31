@@ -28,7 +28,8 @@ add_executable(CPPOpenGL
     ${CMAKE_SOURCE_DIR}/src/Sphere.cpp
     ${CMAKE_SOURCE_DIR}/src/Taurus.cpp
     ${CMAKE_SOURCE_DIR}/src/Torus.cpp
-    ${CMAKE_SOURCE_DIR}/src/chapter6/program6_2.cpp
+    ${CMAKE_SOURCE_DIR}/src/Pipe.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter6/customPipe.cpp
 )
 
 # Link the libraries
