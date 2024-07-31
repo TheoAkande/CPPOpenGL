@@ -16,6 +16,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/chapter4
     ${CMAKE_SOURCE_DIR}/src/chapter5
     ${CMAKE_SOURCE_DIR}/src/chapter6
+    ${CMAKE_SOURCE_DIR}/src/chapter7
 )
 
 # Add the library directory
@@ -30,7 +31,7 @@ add_executable(CPPOpenGL
     ${CMAKE_SOURCE_DIR}/src/Torus.cpp
     ${CMAKE_SOURCE_DIR}/src/Pipe.cpp
     ${CMAKE_SOURCE_DIR}/src/ImportedModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/chapter6/program6_3.cpp
+    ${CMAKE_SOURCE_DIR}/src/chapter7/program7_1.cpp
 )
 
 # Link the libraries
@@ -53,7 +54,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/src/shaders DESTINATION ${CMAKE_BINARY_DIR})
 add_custom_command(
     TARGET CPPOpenGL POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/src/chapter6/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
+    ${CMAKE_SOURCE_DIR}/src/chapter7/shaders $<TARGET_FILE_DIR:CPPOpenGL>/shaders
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR})
