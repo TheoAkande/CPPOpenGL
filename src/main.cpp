@@ -1,9 +1,9 @@
-#include "program7_3.h"
+#include "customPipeWithLighting.h"
 
 using namespace std;
 
 int main(void) {
 
-    program7_3();
+    customPipe();
 
 }
