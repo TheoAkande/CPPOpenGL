@@ -22,7 +22,7 @@ float aspect;
 double tf;
 glm::mat4 pMat, vMat, mMat, mvMat, tMat, rMat;
 
-ImportedModel myModel("assets/objects/formattedPot.obj");
+ImportedModel myModel("assets/objects/pyr.obj");
 
 GLuint brickTexture, iceTexture, customTexture, earthTexture;
 
@@ -60,7 +60,7 @@ void setupVertices(void) {
 }
 
 void init(GLFWwindow* window) {
-    renderingProgram = Utils::createShaderProgram("shaders/vert6_3.glsl", "shaders/frag6_3.glsl");
+    renderingProgram = Utils::createShaderProgram("shaders/vert6_1.glsl", "shaders/frag6_1.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
 
     cameraLoc = glm::vec3(0.0f, 0.0f, 8.0f);
@@ -83,6 +83,9 @@ void display(GLFWwindow* window, double currentTime) {
 
     glClear(GL_DEPTH_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
 
     glUseProgram(renderingProgram);
     // get the uniform variables for the MV and projection matrices
@@ -111,7 +114,7 @@ void display(GLFWwindow* window, double currentTime) {
     glEnableVertexAttribArray(1);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, customTexture);
+    glBindTexture(GL_TEXTURE_2D, brickTexture);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
