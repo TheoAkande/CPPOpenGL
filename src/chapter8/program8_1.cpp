@@ -158,10 +158,10 @@ void installLights(GLuint renderingProgram, glm::mat4 vMatrix) {
     glProgramUniform4fv(renderingProgram, diffLoc, 1, lightDiffuse);
     glProgramUniform4fv(renderingProgram, specLoc, 1, lightSpecular);
     glProgramUniform3fv(renderingProgram, posLoc, 1, lightPos);
-    glProgramUniform4fv(renderingProgram, mAmbLoc, 1, matAmb);
-    glProgramUniform4fv(renderingProgram, mDiffLoc, 1, matDif);
-    glProgramUniform4fv(renderingProgram, mSpecLoc, 1, matSpe);
-    glProgramUniform1f(renderingProgram, mShiLoc, matShi);
+    glProgramUniform4fv(renderingProgram, mAmbLoc, 1, curAmb);
+    glProgramUniform4fv(renderingProgram, mDiffLoc, 1, curDif);
+    glProgramUniform4fv(renderingProgram, mSpecLoc, 1, curSpe);
+    glProgramUniform1f(renderingProgram, mShiLoc, curShi);
 }
 
 void setupShadowBuffers(GLFWwindow* window) {
@@ -187,6 +187,8 @@ void init(GLFWwindow* window) {
     renderingProgram1 = Utils::createShaderProgram("shaders/vert8_1_1.glsl", "shaders/frag8_1_1.glsl");
     renderingProgram2 = Utils::createShaderProgram("shaders/vert8_1_2.glsl", "shaders/frag8_1_2.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
+
+    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degrees
 
     cameraLoc = glm::vec3(0.0f, 0.0f, 8.0f);
     cameraPoint = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -227,8 +229,8 @@ void passOne(void) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
+    // glEnable(GL_CULL_FACE);
+    // glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]); // vbo[3] contains torus indices
@@ -237,7 +239,7 @@ void passOne(void) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo[4]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
-    glCullFace(GL_CCW);
+    // glCullFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     // The pyramid is not indexed, so we use glDrawArrays() rather than glDrawElements()
@@ -281,8 +283,8 @@ void passTwo(void) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
+    // glEnable(GL_CULL_FACE);
+    // glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]); // vbo[3] contains torus indices
@@ -317,8 +319,8 @@ void passTwo(void) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
+    // glEnable(GL_CULL_FACE);
+    // glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glDrawArrays(GL_TRIANGLES, 0, numPyramidVertices);
@@ -335,7 +337,7 @@ void display(GLFWwindow* window, double currentTime) {
     glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowTex, 0);
     // disable drawing colors, but enable the depth computation
-    glDrawBuffer(GL_NONE);
+    glDrawBuffer(GL_FRONT);
     glEnable(GL_DEPTH_TEST);
     passOne();
     // restore the default display buffer, and re-enable drawing
@@ -347,6 +349,7 @@ void display(GLFWwindow* window, double currentTime) {
 }
 
 int program8_1(void) {
+
     if (!glfwInit()) { 
         exit(EXIT_FAILURE); 
     }
