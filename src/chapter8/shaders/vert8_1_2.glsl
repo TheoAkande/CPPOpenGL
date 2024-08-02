@@ -29,10 +29,10 @@ layout (binding = 0) uniform sampler2DShadow shTex;
 
 void main(void)
 {
-    varyingVertPos = (mv_matrix * vec4(vertPos, 1.0)).xyz;
-    varyingLightDir = light.position - varyingVertPos;
-    varyingNormal = (norm_matrix * vec4(vertNormal, 1.0)).xyz;
-    varyingHalfVec = (varyingLightDir -varyingVertPos).xyz;
-    shadow_coord = shadowMVP2 * vec4(vertPos, 1.0);
+    // varyingVertPos = (mv_matrix * vec4(vertPos, 1.0)).xyz;
+    // varyingLightDir = light.position - varyingVertPos;
+    // varyingNormal = (norm_matrix * vec4(vertNormal, 1.0)).xyz;
+    // varyingHalfVec = (varyingLightDir -varyingVertPos).xyz;
+    // shadow_coord = shadowMVP2 * vec4(vertPos, 1.0);
     gl_Position = proj_matrix * mv_matrix * vec4(vertPos.xyz, 1.0);
 }

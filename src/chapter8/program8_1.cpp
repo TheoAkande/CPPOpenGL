@@ -66,8 +66,8 @@ glm::vec3 torusLoc(1.6f, 0.0f, -0.3f);
 glm::vec3 pyrLoc(-1.0f, 0.1f, 0.3f);
 glm::vec3 cameraLoc(0.0f, 0.2f, 6.0f);
 glm::vec3 lightLoc(-3.8f, 2.2f, 1.1f);
-glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 origin(0.0f, 0.0f, 0.0f);
+glm::vec3 up(0.0f, 0.0f, 1.0f);
 
 void setupVertices(void) { 
 

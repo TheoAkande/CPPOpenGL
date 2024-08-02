@@ -28,17 +28,17 @@ layout (binding = 0) uniform sampler2DShadow shTex;
 
 void main(void)
 {
-    vec3 L = normalize(varyingLightDir);
-    vec3 N = normalize(varyingNormal);
-    vec3 E = normalize(-varyingVertPos);
-    vec3 H = normalize(varyingHalfVec);
+    // vec3 L = normalize(varyingLightDir);
+    // vec3 N = normalize(varyingNormal);
+    // vec3 E = normalize(-varyingVertPos);
+    // vec3 H = normalize(varyingHalfVec);
 
-    float notInShadow = textureProj(shTex, shadow_coord);
+    // float notInShadow = textureProj(shTex, shadow_coord);
 
-    fragColor = globalAmbient * material.ambient + light.ambient * material.ambient;
-    if (notInShadow == 1.0) {
-        fragColor += light.diffuse * material.diffuse * max(dot(L, N), 0.0)
-        + light.specular * material.specular * pow(max(dot(H, N), 0.0), material.shininess * 3.0);
-    }
+    // fragColor = globalAmbient * material.ambient + light.ambient * material.ambient;
+    // if (notInShadow == 1.0) {
+    //     fragColor += light.diffuse * material.diffuse * max(dot(L, N), 0.0)
+    //     + light.specular * material.specular * pow(max(dot(H, N), 0.0), material.shininess * 3.0);
+    // }
     fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
