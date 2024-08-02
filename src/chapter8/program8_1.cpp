@@ -253,7 +253,7 @@ void passTwo(void) {
     mvLoc = glGetUniformLocation(renderingProgram2, "mv_matrix");
     projLoc = glGetUniformLocation(renderingProgram2, "proj_matrix");
     nLoc = glGetUniformLocation(renderingProgram2, "norm_matrix");
-    sLoc = glGetUniformLocation(renderingProgram2, "shadowMVP");
+    sLoc = glGetUniformLocation(renderingProgram2, "shadowMVP2");
     // the torus is bronze
     curAmb[0] = bronzeMatAmb[0]; curAmb[1] = bronzeMatAmb[1]; curAmb[2] = bronzeMatAmb[2];
     curDif[0] = bronzeMatDif[0]; curDif[1] = bronzeMatDif[1]; curDif[2] = bronzeMatDif[2];
@@ -331,7 +331,8 @@ void display(GLFWwindow* window, double currentTime) {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
     // set up view and perspective matrix from the light point of view, for pass 1
-    lightVmatrix = glm::lookAt(currentLightPos, origin, up); // vector from light to origin
+    lightVmatrix = glm::lookAt(currentLightPos, origin, up); // vector from light to 
+    // lightVmatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, -8.0f), origin, up); // vector from light to origin
     lightPmatrix = glm::perspective(toRadians(60.0f), aspect, 0.1f, 1000.0f);
     // make the custom frame buffer current, and associate it with the shadow texture
     glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
