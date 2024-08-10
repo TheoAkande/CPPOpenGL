@@ -102,6 +102,14 @@ int Utils::finalizeShaderProgram(GLuint sprogram)
 	return sprogram;
 }
 
+GLuint Utils::createShaderProgram(const char *cs) {
+	GLuint computeShader = prepareShader(GL_COMPUTE_SHADER, cs);
+	GLuint csProgram = glCreateProgram();
+	glAttachShader(csProgram, computeShader);
+	finalizeShaderProgram(csProgram);
+	return csProgram;
+}
+
 GLuint Utils::createShaderProgram(const char *vp, const char *fp) {
 	GLuint vShader = prepareShader(GL_VERTEX_SHADER, vp);
 	GLuint fShader = prepareShader(GL_FRAGMENT_SHADER, fp);
