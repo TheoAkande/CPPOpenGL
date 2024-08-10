@@ -18,7 +18,7 @@ GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
 GLuint mvLoc, projLoc, nLoc;
-GLuint globalAmbLoc, ambLoc, diffLoc, specLoc, posLoc, mAmbLoc, mDiffLoc, mSpecLoc, mShiLoc, sLoc;
+GLint globalAmbLoc, ambLoc, diffLoc, specLoc, posLoc, mAmbLoc, mDiffLoc, mSpecLoc, mShiLoc, sLoc;
 glm::mat4 pMat, vMat, mMat, mvMat, invTrMat;
 glm::vec3 currentLightPos, lightPosV; // light position as Vector3f, in both model and view space
 float lightPos[3]; // light position as float array
@@ -67,7 +67,7 @@ glm::vec3 pyrLoc(-1.0f, 0.1f, 0.3f);
 glm::vec3 cameraLoc(0.0f, 0.2f, 6.0f);
 glm::vec3 lightLoc(-3.8f, 2.2f, 1.1f);
 glm::vec3 origin(0.0f, 0.0f, 0.0f);
-glm::vec3 up(0.0f, 0.0f, 1.0f);
+glm::vec3 up(0.0f, 1.0f, 0.0f);
 
 void setupVertices(void) { 
 
@@ -170,6 +170,7 @@ void setupShadowBuffers(GLFWwindow* window) {
     screenSizeY = height;
     // create the custom frame buffer
     glGenFramebuffers(1, &shadowBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
     // create the shadow texture and configure it to hold depth information.
     // these steps are similar to those in Program 5.2
     glGenTextures(1, &shadowTex);
@@ -178,24 +179,46 @@ void setupShadowBuffers(GLFWwindow* window) {
     screenSizeX, screenSizeY, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-    GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTex, 0);
 }
 
+
+
+void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << " type = " << type 
+              << ", severity = " << severity 
+              << ", message = " << message << std::endl;
+}
+
+
+
 void init(GLFWwindow* window) {
+
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, 0);
+
     renderingProgram1 = Utils::createShaderProgram("shaders/vert8_1_1.glsl", "shaders/frag8_1_1.glsl");
     renderingProgram2 = Utils::createShaderProgram("shaders/vert8_1_2.glsl", "shaders/frag8_1_2.glsl");
-    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
+
+    // cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
 
     pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degrees
 
     cameraLoc = glm::vec3(0.0f, 0.0f, 8.0f);
     cameraPoint = glm::vec3(0.0f, 0.0f, 0.0f);
     cameraRotAngle = 0.0f;
-    sphereLocX = 0.0f; sphereLocY = 0.0f; sphereLocZ = 0.0f;
+    // sphereLocX = 0.0f; sphereLocY = 0.0f; sphereLocZ = 0.0f;
+    
+
     setupVertices();
+    
+
     setupShadowBuffers(window);
+    
+
     b = glm::mat4(
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f,
@@ -203,10 +226,10 @@ void init(GLFWwindow* window) {
         0.5f, 0.5f, 0.5f, 1.0f
     );
 
-    brickTexture = Utils::loadTexture("assets/textures/brick1.jpg");
-    iceTexture = Utils::loadTexture("assets/textures/ice.jpg");
-    customTexture = Utils::loadTexture("assets/textures/5050.jpg");
-    earthTexture = Utils::loadTexture("assets/textures/earth.jpg");
+    // brickTexture = Utils::loadTexture("assets/textures/brick1.jpg");
+    // iceTexture = Utils::loadTexture("assets/textures/ice.jpg");
+    // customTexture = Utils::loadTexture("assets/textures/5050.jpg");
+    // earthTexture = Utils::loadTexture("assets/textures/earth.jpg");
 }
 
 float toRadians(float degrees) {
@@ -216,13 +239,18 @@ float toRadians(float degrees) {
 void passOne(void) {
     // renderingProgram1 includes the pass one vertex and fragment shaders
     glUseProgram(renderingProgram1);
+
     // the following blocks of code render the torus to establish the depth buffer from the light point of view
     mMat = glm::translate(glm::mat4(1.0f), torusLoc);
     // slight rotation for viewability
     mMat = glm::rotate(mMat, toRadians(25.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     // we are drawing from the light’s point of view, so we use the light’s P and V matrices
     shadowMVP1 = lightPmatrix * lightVmatrix * mMat;
+    
     sLoc = glGetUniformLocation(renderingProgram1, "shadowMVP");
+    if (sLoc < 0) {
+        cout << "inval" << endl;
+    }
     glUniformMatrix4fv(sLoc, 1, GL_FALSE, glm::value_ptr(shadowMVP1));
     // we only need to set up torus vertices buffer – we don’t need its textures or normals for pass one.
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
@@ -234,8 +262,17 @@ void passOne(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]); // vbo[3] contains torus indices
+
     glDrawElements(GL_TRIANGLES, numTorusIndices, GL_UNSIGNED_INT, 0);
+    Utils::checkOpenGLError();
     // repeat for the pyramid (but don’t clear the GL_DEPTH_BUFFER_BIT)
+    
+    sLoc = glGetUniformLocation(renderingProgram1, "shadowMVP");
+    if (sLoc < 0) {
+        cout << "inv" << endl;
+    }
+    glUniformMatrix4fv(sLoc, 1, GL_FALSE, glm::value_ptr(shadowMVP1));
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo[4]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
@@ -243,11 +280,14 @@ void passOne(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     // The pyramid is not indexed, so we use glDrawArrays() rather than glDrawElements()
+
     glDrawArrays(GL_TRIANGLES, 0, numPyramidVertices);
+    Utils::checkOpenGLError();
 }
 
 void passTwo(void) {
     glUseProgram(renderingProgram2); // pass two vertex and fragment shaders
+    Utils::checkOpenGLError();
     // draw the torus – this time we need to include lighting, materials, normals, etc.
     // We also need to provide MVP tranforms for BOTH camera space and light space.
     mvLoc = glGetUniformLocation(renderingProgram2, "mv_matrix");
@@ -259,7 +299,8 @@ void passTwo(void) {
     curDif[0] = bronzeMatDif[0]; curDif[1] = bronzeMatDif[1]; curDif[2] = bronzeMatDif[2];
     curSpe[0] = bronzeMatSpe[0]; curSpe[1] = bronzeMatSpe[1]; curSpe[2] = bronzeMatSpe[2];
     curShi = bronzeMatShi;
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraLoc.x, -cameraLoc.y, -cameraLoc.z));
+    // vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraLoc.x, -cameraLoc.y, -cameraLoc.z));
+    Utils::calculateVMat(&vMat, &cameraLoc, &cameraPoint, cameraRotAngle);
     currentLightPos = glm::vec3(lightLoc);
     installLights(renderingProgram2, vMat);
     mMat = glm::translate(glm::mat4(1.0f), torusLoc);
@@ -283,12 +324,14 @@ void passTwo(void) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
     glClear(GL_DEPTH_BUFFER_BIT);
-    // glEnable(GL_CULL_FACE);
-    // glFrontFace(GL_CCW);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]); // vbo[3] contains torus indices
+
     glDrawElements(GL_TRIANGLES, numTorusIndices, GL_UNSIGNED_INT, 0);
+    Utils::checkOpenGLError();
     
     // the torus is bronze
     curAmb[0] = goldMatAmb[0]; curAmb[1] = goldMatAmb[1]; curAmb[2] = goldMatAmb[2];
@@ -319,11 +362,12 @@ void passTwo(void) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
     glClear(GL_DEPTH_BUFFER_BIT);
-    // glEnable(GL_CULL_FACE);
-    // glFrontFace(GL_CCW);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glDrawArrays(GL_TRIANGLES, 0, numPyramidVertices);
+    Utils::checkOpenGLError();
 }
 
 void display(GLFWwindow* window, double currentTime) {
@@ -337,9 +381,13 @@ void display(GLFWwindow* window, double currentTime) {
     // make the custom frame buffer current, and associate it with the shadow texture
     glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowTex, 0);
-    // disable drawing colors, but enable the depth computation
-    glDrawBuffer(GL_FRONT);
+
+    // // disable drawing colors, but enable the depth computation
+    glDrawBuffer(GL_NONE);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glEnable(GL_DEPTH_TEST);
+
     passOne();
     // restore the default display buffer, and re-enable drawing
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -90,6 +90,9 @@ int Utils::finalizeShaderProgram(GLuint sprogram)
 	GLint linked;
 	glLinkProgram(sprogram);
 	checkOpenGLError();
+	cout  << "logs :";
+	printProgramLog(sprogram);
+	cout << endl;
 	glGetProgramiv(sprogram, GL_LINK_STATUS, &linked);
 	if (linked != 1)
 	{
